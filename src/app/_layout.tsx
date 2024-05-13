@@ -4,10 +4,11 @@ import {
   Poppins_700Bold,
   useFonts,
 } from "@expo-google-fonts/poppins"
-import { Slot } from "expo-router"
+import { Stack } from "expo-router"
 import * as SplashScreen from "expo-splash-screen"
 import { StatusBar } from "react-native"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
+import { Header } from "./_components/header"
 
 SplashScreen.preventAutoHideAsync()
 
@@ -24,8 +25,17 @@ export default function Layout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <StatusBar barStyle="dark-content" translucent />
-      {fontsLoaded && <Slot />}
+      <StatusBar barStyle="light-content" translucent />
+      {fontsLoaded && 
+        <Stack
+        screenOptions={{
+  
+        }}>
+          <Stack.Screen name="index" options={{
+            header: Header,
+          }} />
+        </Stack>
+        }
     </GestureHandlerRootView>
   )
 }
