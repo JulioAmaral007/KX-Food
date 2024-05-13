@@ -1,41 +1,73 @@
-import { Link, Stack } from 'expo-router';
-import { Image, StyleSheet, Text, View } from 'react-native';
+import { router } from "expo-router"
+import { useEffect } from "react"
+import { StyleSheet, View, useWindowDimensions } from "react-native"
 
-function LogoTitle() {
-  return (
-    <Image style={styles.image} source={{ uri: 'https://reactnative.dev/img/tiny_logo.png' }} />
-  );
-}
+import Animated, {
+  runOnJS,
+  useAnimatedStyle,
+  useSharedValue,
+  withSequence,
+  withTiming
+} from "react-native-reanimated"
 
-export default function Home() {
+import { theme } from "@/theme"
+
+export default function Splash() {
+  const logoScale = useSharedValue(1)
+  const contentDisplay = useSharedValue(0)
+
+  const dimensions = useWindowDimensions()
+
+  const logoAnimatedStyles = useAnimatedStyle(() => ({
+    transform: [
+      { scale: logoScale.value },
+    ],
+  }))
+
+  function logoAnimation() {
+    logoScale.value = withSequence(
+      withTiming(0.7),
+      withTiming(1.3),
+      withTiming(1, undefined, (finished) => {
+        if(finished){
+          contentDisplay.value = withTiming(1, {duration: 500})
+
+          runOnJS(onEndSplash)()
+        }
+      })
+    )
+  }
+
+  function onEndSplash() {
+    setTimeout(() => {
+      router.push("/(stack)")
+    }, 2000)
+  }
+
+  useEffect(() => {
+    logoAnimation()
+  }, [])
+
   return (
     <View style={styles.container}>
-      <Stack.Screen
-        options={{
-          title: 'My home',
-          headerStyle: { backgroundColor: '#f4511e' },
-          headerTintColor: '#fff',
-          headerTitleStyle: {
-            fontWeight: 'bold',
-          },
-
-          headerTitle: props => <LogoTitle {...props} />,
-        }}
+      <Animated.Image
+        source={require("@/assets/logo.png")}
+        style={[styles.logo, logoAnimatedStyles]}
       />
-      <Text>Home Screen</Text>
-      <Link href={{ pathname: 'details', params: { name: 'Bacon' } }}>Go to Details</Link>
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: theme.colors.black,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 12,
   },
-  image: {
-    width: 50,
-    height: 50,
+  logo: {
+    width: 64,
+    height: 64,
   },
-});
+})
